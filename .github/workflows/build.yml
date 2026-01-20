@@ -1,0 +1,86 @@
+name: Compile Kernel
+
+on:
+  workflow_dispatch:
+jobs:
+  PixelOS_Kernel_CI:
+    env:
+        CLANG_VER: clang-r547379
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: |
+            sudo apt update
+            sudo apt install -y \
+            bc bison flex \
+            libssl-dev \
+            libelf-dev \
+            libdw-dev \
+            build-essential \
+            lz4 \
+            git \
+            python3 \
+            curl \
+            gcc-aarch64-linux-gnu
+
+      - name: Clone Kernel Source
+        run: |
+            git clone https://github.com/LineageOS/android_kernel_oneplus_sm8150.git --depth=1  -b lineage-23.1 sm8150
+
+      - name: Download AOSP Clang
+        run: |
+          mkdir -p toolchains/${CLANG_VER}
+          cd toolchains
+
+          curl -LO https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/main/${CLANG_VER}.tar.gz
+          tar -xf "${CLANG_VER}.tar.gz" -C ${CLANG_VER}
+
+      - name: Compile Kernel
+        run: |
+          CLANG_ROOT="${GITHUB_WORKSPACE}/toolchains/${CLANG_VER}/bin"
+          export PATH="${CLANG_ROOT}:$PATH"
+          export ARCH=arm64
+          export SUBARCH=arm64
+          export LLVM=1
+          export LLVM_IAS=1
+          export CC="${CLANG_ROOT}/clang"
+          export CXX="${CLANG_ROOT}/clang++"
+          export HOSTCC="${CLANG_ROOT}/clang"
+          export HOSTCXX="${CLANG_ROOT}/clang++"
+          export LD="${CLANG_ROOT}/ld.lld"
+          export AR="${CLANG_ROOT}/llvm-ar"
+          export NM="${CLANG_ROOT}/llvm-nm"
+          export OBJCOPY="${CLANG_ROOT}/llvm-objcopy"
+          export OBJDUMP="${CLANG_ROOT}/llvm-objdump"
+          export STRIP="${CLANG_ROOT}/llvm-strip"
+          export CROSS_COMPILE:=aarch64-linux-gnu-
+          cd sm8150
+
+          curl -LSs "https://raw.githubusercontent.com/backslashxx/KernelSU/refs/heads/master/kernel/setup.sh" | bash -s master
+
+          echo CONFIG_KSU_TAMPER_SYSCALL_TABLE=y >> out/.config
+
+          touch ./.scmversion
+
+          make ARCH=arm64 O=out vendor/sm8150-perf_defconfig vendor/oplus.config
+          make -j2 O=out Image
+
+      - name: Make AnyKernel3
+        run: |
+          git clone https://github.com/osm0sis/AnyKernel3.git
+
+          cp sm8150/out/arch/arm64/boot/Image AnyKernel3/Image
+          cp sm8150/out/arch/arm64/boot/Image ../Image
+          cd AnyKernel3
+
+          zip -r9 ../xxKernelSU.zip * -x .git README.md *placeholder
+
+      - name: Create GitHub Release
+        run: |
+          REL_NAME="PixelOS_OPSM8550_$(date -u +"%Y%m%d_%H%M")"
+          cd ${GITHUB_WORKSPACE}
+          gh release create "$REL_NAME" --title "$REL_NAME" --notes "" xxKernelSU.zip Image
