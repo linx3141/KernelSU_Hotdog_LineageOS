@@ -8,7 +8,10 @@ jobs:
         CLANG_VER: clang-r547379
         GH_TOKEN: ${{ github.token }}
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: write 
+      actions: read
+      checks: read
     steps:
       - uses: actions/checkout@v4
 
