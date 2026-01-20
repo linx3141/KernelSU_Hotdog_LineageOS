@@ -62,11 +62,11 @@ jobs:
 
           curl -LSs "https://raw.githubusercontent.com/backslashxx/KernelSU/refs/heads/master/kernel/setup.sh" | bash -s master
 
-          echo CONFIG_KSU_TAMPER_SYSCALL_TABLE=y >> out/.config
-
           touch ./.scmversion
 
           make ARCH=arm64 O=out vendor/sm8150-perf_defconfig vendor/oplus.config
+          echo CONFIG_KSU_TAMPER_SYSCALL_TABLE=y >> out/.config
+
           make -j2 O=out Image
 
       - name: Make AnyKernel3
