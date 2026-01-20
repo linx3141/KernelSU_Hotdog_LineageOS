@@ -6,7 +6,7 @@ jobs:
   PixelOS_Kernel_CI:
     env:
         CLANG_VER: clang-r547379
-
+        GH_TOKEN: ${{ github.token }}
     runs-on: ubuntu-latest
 
     steps:
