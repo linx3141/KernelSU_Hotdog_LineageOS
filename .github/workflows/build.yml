@@ -84,6 +84,6 @@ jobs:
 
       - name: Create GitHub Release
         run: |
-          REL_NAME="PixelOS_OPSM8550_$(date -u +"%Y%m%d_%H%M")"
+          REL_NAME="LineageOS_OPSM8150_$(date -u +"%Y%m%d_%H%M")"
           cd ${GITHUB_WORKSPACE}
           gh release create "$REL_NAME" --title "$REL_NAME" --notes "" xxKernelSU.zip Image
