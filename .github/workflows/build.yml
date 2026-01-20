@@ -74,7 +74,7 @@ jobs:
           git clone https://github.com/osm0sis/AnyKernel3.git
 
           cp sm8150/out/arch/arm64/boot/Image AnyKernel3/Image
-          cp sm8150/out/arch/arm64/boot/Image ../Image
+          cp sm8150/out/arch/arm64/boot/Image ./Image
           cd AnyKernel3
 
           zip -r9 ../xxKernelSU.zip * -x .git README.md *placeholder
