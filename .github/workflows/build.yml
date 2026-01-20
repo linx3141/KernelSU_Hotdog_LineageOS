@@ -57,7 +57,7 @@ jobs:
           export OBJCOPY="${CLANG_ROOT}/llvm-objcopy"
           export OBJDUMP="${CLANG_ROOT}/llvm-objdump"
           export STRIP="${CLANG_ROOT}/llvm-strip"
-          export CROSS_COMPILE:=aarch64-linux-gnu-
+          export CROSS_COMPILE=aarch64-linux-gnu-
           cd sm8150
 
           curl -LSs "https://raw.githubusercontent.com/backslashxx/KernelSU/refs/heads/master/kernel/setup.sh" | bash -s master
