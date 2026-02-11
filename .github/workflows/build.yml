@@ -79,7 +79,7 @@ jobs:
           cp sm8150/out/arch/arm64/boot/Image AnyKernel3/Image
           cp sm8150/out/arch/arm64/boot/Image ./Image
           cd AnyKernel3
-          sed -i "s|ksu_supported=false|ksu_supported=true|"
+          sed -i "s|ksu_supported=false|ksu_supported=true|" anykernel.sh
           zip -r9 ../xxKernelSU.zip * -x .git README.md *placeholder
 
       - name: Create GitHub Release
